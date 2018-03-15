@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            #content{width:600px;height:200px;}
+        </style>
+        <meta charset="utf-8"/>
+    </head>
+    <body id="body">
+        <textarea id="content" rows="40" cols="500"></textarea>
+        <div class="btn">
+            <input type="button" value="清空" onclick="reset()"/>
+            <input type="button" value="发送" onclick="send()">
+        </div>
+        <script src='js/jquery-2.0.3.min.js'></script>
+        <script type="text/javascript">
+        	alert(getUrlParam(encodeURIComponent("sessionId")));
+            var socket = new WebSocket('ws://127.0.0.1:8088/'+getUrlParam(encodeURIComponent("sessionId"))); 
+            //创建Socket 
+            socket.onopen = function(event) { 
+              //接收数据事件
+              socket.onmessage = function(event) {
+                body.innerHTML+="<br/>"+event.data;
+              }; 
+              // socket关闭事件
+              socket.onclose = function(event) {
+                body.innerHTML+="<br/>系统：已和服务器断开连接！！！";
+              }; 
+              //关闭socket
+              //socket.close()
+            };
+
+            //-----------
+            var body=document.getElementById("body");
+            function send(){
+                var msg=document.getElementById("content").value;//获取输入框内容
+                socket.send(msg);//发送消息
+                reset();//清空输入框
+                //body.innerHTML+="<br/>我："+msg;
+            }
+
+            function reset(){
+                document.getElementById("content").value="";
+            }
+            
+            function getUrlParam(name) {
+        		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); // 构造一个含有目标参数的正则表达式对象
+        		var r = window.location.search.substr(1).match(reg); // 匹配目标参数
+        		if (r != null)
+        			return unescape(r[2]);
+        		return null; // 返回参数值
+        	}
+        </script>
+    </body>
+</html>
